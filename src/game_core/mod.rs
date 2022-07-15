@@ -1,29 +1,27 @@
-pub fn start(){
-    const MAX_CHANCES: u8 = 5;
 
-    let random_number = generate_random_number();
+pub fn run_game(total_chances: u8, random_number: u8, receive_number: fn() -> u8) -> Result<u8, u8> {
     let mut won_game = false;
-    let mut chances = MAX_CHANCES;
+    let mut chances = total_chances;
 
-    while chances > 0 && !won_game {
+    while can_run(chances, won_game) {
         let user_number = receive_number();
-        won_game = user_number == random_number;
-        chances -= 1;
+        won_game = verify_win_conditions(random_number)(user_number);
+        chances = calculate_chances(chances);
     }
     if won_game {
-        println!("You win!!")
-    } else {
-        println!("You lose!!")
+        return Ok(chances);
     }
-
-
-}
-fn generate_random_number() -> u8 {
-    0 
+    Err(chances)
 }
 
-fn receive_number() -> u8 {
-    0 
+fn calculate_chances(chances: u8) -> u8 {
+    chances - 1
+}
+fn verify_win_conditions(random_number: u8) -> impl Fn(u8) -> bool {
+    move |user_number: u8| user_number == random_number
+}
+fn can_run(chances: u8, won_game: bool) -> bool {
+    chances > 0 && !won_game
 }
 
 #[cfg(test)]
@@ -31,7 +29,7 @@ mod test_game_logic {
     use super::*;
 
     #[test]
-    fn test_random_number() {
-        assert_eq!(generate_random_number(), 0)
+    fn test_run_game() {
+        todo!()
     }
 }
